@@ -120,9 +120,14 @@ end
 Get notified when the client sends a request with the same idempotency key:
 
 ```ruby
-class RailsCallback < Callback
+class RailsCallback
+  attr_reader :request
+  
+  def initialize(request)
+    @request = request
+  end
+  
   def detected(key:)
-    # `request` is also available
     Rails.logger.warn "IdempotentRequest request detected, key: #{key}"
   end
 end
