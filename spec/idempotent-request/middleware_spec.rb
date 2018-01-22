@@ -9,13 +9,13 @@ RSpec.describe IdempotentRequest::Middleware do
       )
   end
   let(:storage) { @memory_storage ||= IdempotentRequest::MemoryStorage.new }
-  let(:decider) do
-    class_double('IdempotentRequest::Decider', new: double(should?: true))
+  let(:policy) do
+    class_double('IdempotentRequest::policy', new: double(should?: true))
   end
 
   let(:middleware) do
     described_class.new(app,
-      decider: decider,
+      policy: policy,
       storage: storage,
       header_key: 'X-Qonto-Idempotency-Key'
     )
@@ -45,8 +45,8 @@ RSpec.describe IdempotentRequest::Middleware do
   end
 
   context 'when should not be idempotent' do
-    let(:decider) do
-      class_double('IdempotentRequest::Decider', new: double(should?: false))
+    let(:policy) do
+      class_double('IdempotentRequest::policy', new: double(should?: false))
     end
 
     it 'should not read storage' do

@@ -3,7 +3,7 @@ module IdempotentRequest
     def initialize(app, config = {})
       @app = app
       @config = config
-      @decider = config[:decider]
+      @policy = config.fetch(:policy)
     end
 
     def call(env)
@@ -20,15 +20,15 @@ module IdempotentRequest
 
     private
 
-    attr_reader :app, :env, :config, :request, :decider
+    attr_reader :app, :env, :config, :request, :policy
 
     def process?
       !request.key.to_s.empty? && should_be_idempotent?
     end
 
     def should_be_idempotent?
-      return false unless decider
-      decider.new(request).should?
+      return false unless policy
+      policy.new(request).should?
     end
 
     def set_request(env)
