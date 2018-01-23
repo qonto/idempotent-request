@@ -1,4 +1,4 @@
-# Idempotent Request
+# Idempotent Request [![Build Status](https://travis-ci.org/qonto/idempotent-request.svg?branch=master)](https://travis-ci.org/qonto/idempotent-request)
 
 Rack middleware ensuring at most once requests for mutating endpoints.
 
