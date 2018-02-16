@@ -81,14 +81,27 @@ RSpec.describe IdempotentRequest::RequestManager do
       })
     end
 
-    context 'when status is 200' do
-      let(:data) do
-        [200, {}, 'body']
+    describe 'when status 2xx' do
+      context 'when status is 200' do
+        let(:data) do
+          [200, {}, 'body']
+        end
+
+        it 'should be stored' do
+          request_storage.write(*data)
+          expect(memory_storage.read(request.key)).to eq(payload)
+        end
       end
 
-      it 'should be stored' do
-        request_storage.write(*data)
-        expect(memory_storage.read(request.key)).to eq(payload)
+      context 'when status is 226' do
+        let(:data) do
+          [226, {}, 'body']
+        end
+
+        it 'should be stored' do
+          request_storage.write(*data)
+          expect(memory_storage.read(request.key)).to eq(payload)
+        end
       end
     end
 
@@ -97,7 +110,7 @@ RSpec.describe IdempotentRequest::RequestManager do
         [404, {}, 'body']
       end
 
-      it 'should be stored' do
+      it 'should not be stored' do
         request_storage.write(*data)
         expect(memory_storage.read(request.key)).to be_nil
       end
