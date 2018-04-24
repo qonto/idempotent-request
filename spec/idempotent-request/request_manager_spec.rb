@@ -77,7 +77,7 @@ RSpec.describe IdempotentRequest::RequestManager do
       Oj.dump({
         status: data[0],
         headers: data[1],
-        response: data[2]
+        response: [data[2]]
       })
     end
 

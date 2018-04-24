@@ -36,7 +36,7 @@ module IdempotentRequest
       Oj.dump({
         status: status,
         headers: headers.to_h,
-        response: response
+        response: Array(response)
       })
     end
 
