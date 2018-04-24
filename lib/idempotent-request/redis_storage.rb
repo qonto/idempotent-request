@@ -13,8 +13,14 @@ module IdempotentRequest
     end
 
     def write(key, payload)
-      redis.setnx(namespaced_key(key), payload)
-      redis.expire(namespaced_key(key), expire_time.to_i) if expire_time.to_i > 0
+      redis.set(
+        namespaced_key(key),
+        payload,
+        {}.tap do |options|
+          options[:nx] = true
+          options[:ex] = expire_time.to_i if expire_time.to_i > 0
+        end
+      )
     end
 
     private

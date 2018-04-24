@@ -3,7 +3,8 @@ require 'spec_helper'
 RSpec.describe IdempotentRequest::RedisStorage do
   let(:redis) { FakeRedis::Redis.new }
   let(:expire_time) { 3600 }
-  let(:redis_storage) { described_class.new(redis, expire_time: expire_time) }
+  let(:namespace) { 'idempotency_keys' }
+  let(:redis_storage) { described_class.new(redis, expire_time: expire_time, namespace: namespace) }
 
   describe '#read' do
     it 'should be called' do
@@ -15,12 +16,13 @@ RSpec.describe IdempotentRequest::RedisStorage do
   describe '#write' do
     let(:key) { 'key' }
     let(:payload) { {} }
+    let(:namespace) { nil }
 
     context 'when expire time is not set' do
-      let(:redis_storage) { described_class.new(redis) }
+      let(:expire_time) { nil }
 
       it 'should not set expiration' do
-        expect(redis).to receive(:setnx)
+        expect(redis).to receive(:set).with(key, payload, nx: true)
         expect(redis).not_to receive(:expire)
         redis_storage.write(key, payload)
       end
@@ -28,14 +30,15 @@ RSpec.describe IdempotentRequest::RedisStorage do
 
     context 'when expire time is set' do
       it 'should set expiration' do
-        expect(redis).to receive(:setnx)
-        expect(redis).to receive(:expire).with(String, expire_time)
+        expect(redis).to receive(:set).with(key, payload, nx: true, ex: expire_time)
         redis_storage.write(key, payload)
       end
     end
   end
 
   describe '#namespaced_key' do
+    let(:namespace) { 'idempotency_keys' }
+
     subject { redis_storage.send(:namespaced_key, key) }
 
     context 'when key contains a space' do
@@ -55,7 +58,7 @@ RSpec.describe IdempotentRequest::RedisStorage do
     end
 
     context 'when namespace is set to nil' do
-      let(:redis_storage) { described_class.new(redis, namespace: nil) }
+      let(:namespace) { nil }
       let(:key) { 'REQUEST-1' }
 
       it 'should return with default' do
