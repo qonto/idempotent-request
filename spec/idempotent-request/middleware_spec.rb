@@ -42,6 +42,30 @@ RSpec.describe IdempotentRequest::Middleware do
         middleware.call(env)
       end
     end
+
+    context 'when concurrent requests' do
+      before do
+        allow_any_instance_of(IdempotentRequest::RequestManager).to receive(:lock).and_return(false)
+      end
+
+      it 'should not return data from storage' do
+        expect_any_instance_of(IdempotentRequest::RequestManager).to receive(:read).and_return(nil)
+
+        middleware.call(env)
+      end
+
+      it 'should not obtain lock' do
+        expect_any_instance_of(IdempotentRequest::RequestManager).not_to receive(:write)
+
+        middleware.call(env)
+      end
+
+      it 'returns 429' do
+        expect_any_instance_of(described_class).to receive(:concurrent_request_response)
+
+        middleware.call(env)
+      end
+    end
   end
 
   context 'when should not be idempotent' do

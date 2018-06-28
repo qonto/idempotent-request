@@ -13,6 +13,16 @@ RSpec.describe IdempotentRequest::RedisStorage do
     end
   end
 
+  describe '#lock' do
+    let(:key) { 'key' }
+    let(:lock_key) { "#{namespace}:lock:#{key}" }
+
+    it 'should add lock' do
+      expect(redis).to receive(:set).with(lock_key, true, nx: true, ex: expire_time)
+      redis_storage.lock(key)
+    end
+  end
+
   describe '#write' do
     let(:key) { 'key' }
     let(:payload) { {} }

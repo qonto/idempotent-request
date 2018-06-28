@@ -8,6 +8,10 @@ module IdempotentRequest
       @callback = config[:callback]
     end
 
+    def lock
+      storage.lock(key)
+    end
+
     def read
       status, headers, response = parse_data(storage.read(key)).values
 

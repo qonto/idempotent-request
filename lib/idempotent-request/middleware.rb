@@ -14,11 +14,29 @@ module IdempotentRequest
     def process(env)
       set_request(env)
       return app.call(request.env) unless process?
-      storage = RequestManager.new(request, config)
-      storage.read || storage.write(*app.call(request.env))
+      read_idempotent_request ||
+        write_idempotent_request ||
+        concurrent_request_response
     end
 
     private
+
+    def storage
+      @storage ||= RequestManager.new(request, config)
+    end
+
+    def read_idempotent_request
+      storage.read
+    end
+
+    def write_idempotent_request
+      return unless storage.lock
+      storage.write(*app.call(request.env))
+    end
+
+    def concurrent_request_response
+      [429, {}, []]
+    end
 
     attr_reader :app, :env, :config, :request, :policy
 

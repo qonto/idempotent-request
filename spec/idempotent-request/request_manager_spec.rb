@@ -13,6 +13,29 @@ RSpec.describe IdempotentRequest::RequestManager do
     memory_storage.clear
   end
 
+  describe '#lock' do
+    it 'delegates to storage service' do
+      expect(memory_storage).to receive(:lock).with(request.key)
+      request_storage.lock
+    end
+
+    context 'for the first lock' do
+      it 'returns true' do
+        expect(request_storage.lock).to be_truthy
+      end
+    end
+
+    context 'for the second lock' do
+      before do
+        request_storage.lock
+      end
+
+      it 'returns false' do
+        expect(request_storage.lock).to be_falsey
+      end
+    end
+  end
+
   describe '#read' do
     context 'when there is no data' do
       it 'should return nil' do

@@ -8,14 +8,24 @@ module IdempotentRequest
       @expire_time = config[:expire_time]
     end
 
+    def lock(key)
+      setnx_with_expiration(lock_key(key), true)
+    end
+
     def read(key)
       redis.get(namespaced_key(key))
     end
 
     def write(key, payload)
+      setnx_with_expiration(namespaced_key(key), payload)
+    end
+
+    private
+
+    def setnx_with_expiration(key, data)
       redis.set(
-        namespaced_key(key),
-        payload,
+        key,
+        data,
         {}.tap do |options|
           options[:nx] = true
           options[:ex] = expire_time.to_i if expire_time.to_i > 0
@@ -23,10 +33,12 @@ module IdempotentRequest
       )
     end
 
-    private
+    def lock_key(key)
+      namespaced_key("lock:#{key}")
+    end
 
-    def namespaced_key(idempotency_key)
-      [namespace, idempotency_key.strip]
+    def namespaced_key(key)
+      [namespace, key.strip]
         .compact
         .join(':')
         .downcase
