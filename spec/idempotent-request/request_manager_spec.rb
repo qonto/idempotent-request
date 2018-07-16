@@ -36,6 +36,13 @@ RSpec.describe IdempotentRequest::RequestManager do
     end
   end
 
+  describe '#unlock' do
+    it 'delegates to storage service' do
+      expect(memory_storage).to receive(:unlock).with(request.key)
+      request_storage.unlock
+    end
+  end
+
   describe '#read' do
     context 'when there is no data' do
       it 'should return nil' do
@@ -136,6 +143,11 @@ RSpec.describe IdempotentRequest::RequestManager do
       it 'should not be stored' do
         request_storage.write(*data)
         expect(memory_storage.read(request.key)).to be_nil
+      end
+
+      it 'should unlock stored key' do
+        expect(memory_storage).to receive(:unlock).with(request.key)
+        request_storage.write(*data)
       end
     end
   end
