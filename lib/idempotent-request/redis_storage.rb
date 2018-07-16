@@ -12,6 +12,10 @@ module IdempotentRequest
       setnx_with_expiration(lock_key(key), true)
     end
 
+    def unlock(key)
+      redis.del(lock_key(key))
+    end
+
     def read(key)
       redis.get(namespaced_key(key))
     end

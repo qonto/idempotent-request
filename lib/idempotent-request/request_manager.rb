@@ -12,6 +12,10 @@ module IdempotentRequest
       storage.lock(key)
     end
 
+    def unlock
+      storage.unlock(key)
+    end
+
     def read
       status, headers, response = parse_data(storage.read(key)).values
 
@@ -23,8 +27,13 @@ module IdempotentRequest
     def write(*data)
       status, headers, response = data
       response = response.body if response.respond_to?(:body)
-      return data unless (200..226).include?(status)
-      storage.write(key, payload(status, headers, response))
+
+      if (200..226).cover?(status)
+        storage.write(key, payload(status, headers, response))
+      else
+        unlock
+      end
+
       data
     end
 

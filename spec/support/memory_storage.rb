@@ -10,6 +10,12 @@ module IdempotentRequest
       @memory[namespaced_key] = true
     end
 
+    def unlock(key)
+      namespaced_key = lock_key(key)
+      @memory.delete(namespaced_key)
+      @memory[namespaced_key]
+    end
+
     def read(key)
       @memory[key]
     end
