@@ -1,6 +1,6 @@
 require "bundler/setup"
 require 'fakeredis'
-require 'pry'
+require 'byebug'
 require "idempotent-request"
 
 spec = File.expand_path('../', __FILE__)

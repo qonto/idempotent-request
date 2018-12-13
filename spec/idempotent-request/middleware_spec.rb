@@ -29,6 +29,26 @@ RSpec.describe IdempotentRequest::Middleware do
       middleware.call(env)
     end
 
+    it 'should obtain lock and release lock' do
+      expect_any_instance_of(IdempotentRequest::RequestManager).to receive(:lock).and_return(true)
+      expect_any_instance_of(IdempotentRequest::RequestManager).to receive(:write)
+      expect_any_instance_of(IdempotentRequest::RequestManager).to receive(:unlock)
+
+      middleware.call(env)
+    end
+
+    context 'when an exception happens inside another middleware' do
+      let(:app) { ->(_) { raise 'fatality' } }
+
+      it 'should release lock' do
+        expect_any_instance_of(IdempotentRequest::RequestManager).to receive(:lock).and_return(true)
+        expect_any_instance_of(IdempotentRequest::RequestManager).not_to receive(:write)
+        expect_any_instance_of(IdempotentRequest::RequestManager).to receive(:unlock)
+
+        expect { middleware.call(env) }.to raise_error('fatality')
+      end
+    end
+
     context 'when has data in storage' do
       before do
         data = [200, {}, 'body']

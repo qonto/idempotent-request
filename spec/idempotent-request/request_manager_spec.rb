@@ -144,11 +144,6 @@ RSpec.describe IdempotentRequest::RequestManager do
         request_storage.write(*data)
         expect(memory_storage.read(request.key)).to be_nil
       end
-
-      it 'should unlock stored key' do
-        expect(memory_storage).to receive(:unlock).with(request.key)
-        request_storage.write(*data)
-      end
     end
   end
 

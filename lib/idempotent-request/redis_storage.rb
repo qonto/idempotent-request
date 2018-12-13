@@ -9,7 +9,7 @@ module IdempotentRequest
     end
 
     def lock(key)
-      setnx_with_expiration(lock_key(key), true)
+      setnx_with_expiration(lock_key(key), Time.now.to_f)
     end
 
     def unlock(key)

@@ -22,10 +22,9 @@ module IdempotentRequest
     private
 
     def header_name
-      key = @header_name
-        .to_s
-        .upcase
-        .gsub('-', '_')
+      key = @header_name.to_s
+                        .upcase
+                        .tr('-', '_')
 
       key.start_with?('HTTP_') ? key : "HTTP_#{key}"
     end
