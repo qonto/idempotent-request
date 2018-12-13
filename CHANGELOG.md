@@ -1,5 +1,10 @@
 # Idempotent Request Changelog #
 
+## v0.1.5 ##
+
+* use ActiveSupport::Notifications to instrument events
+* fix an issue when getting an exception inside application would not delete lock, so client could receive 429 after 500
+
 ## v0.1.4 ##
 
 * Fix an issue, when http response from backend != 200..226 caused lock to be taken

@@ -84,6 +84,23 @@ module IdempotentRequest
 end
 ```
 
+
+### Use ActiveSupport::Notifications to read events
+
+```ruby
+# config/initializers/idempotent_request.rb
+ActiveSupport::Notifications.subscribe('idempotent.request') do |name, start, finish, request_id, payload|
+  notification = payload[:request].env['idempotent.request']
+  if notification['read']
+    Rails.logger.info "IdempotentRequest: Hit cached response from key #{notification['key']}, response: #{notification['read']}"
+  elsif notification['write']
+    Rails.logger.info "IdempotentRequest: Write: key #{notification['key']}, status: #{notification['write'][0]}, headers: #{notification['write'][1]}, unlocked? #{notification['unlocked']}"
+  elsif notification['concurrent_request_response']
+    Rails.logger.warn "IdempotentRequest: Concurrent request detected with key #{notification['key']}"
+  end
+end
+```
+
 ## Custom options
 
 ```ruby
