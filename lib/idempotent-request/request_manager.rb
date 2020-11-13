@@ -49,10 +49,10 @@ module IdempotentRequest
               response: Array(response))
     end
 
-    def run_callback(action, args)
+    def run_callback(action, **args)
       return unless @callback
 
-      @callback.new(request).send(action, args)
+      @callback.new(request).send(action, **args)
     end
 
     def key
