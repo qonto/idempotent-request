@@ -109,7 +109,8 @@ config.middleware.use IdempotentRequest::Middleware,
   header_key: 'X-Qonto-Idempotency-Key', # by default Idempotency-key
   policy: IdempotentRequest::Policy,
   callback: IdempotentRequest::RailsCallback,
-  storage: IdempotentRequest::RedisStorage.new(::Redis.current, expire_time: 1.day, namespace: 'idempotency_keys')
+  storage: IdempotentRequest::RedisStorage.new(::Redis.current, expire_time: 1.day, namespace: 'idempotency_keys'),
+  conflict_response_status: 409
 ```
 
 ### Policy
@@ -134,7 +135,7 @@ end
 
 ### Callback
 
-Get notified when the client sends a request with the same idempotency key:
+Get notified when a client sends a request with the same idempotency key:
 
 ```ruby
 class RailsCallback
@@ -149,6 +150,10 @@ class RailsCallback
   end
 end
 ```
+
+### Conflict response status
+
+Define http status code that should be returned when a client sends concurrent requests with the same idempotency key.
 
 ## Contributing
 
