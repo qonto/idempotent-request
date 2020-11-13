@@ -5,6 +5,7 @@ module IdempotentRequest
       @config = config
       @policy = config.fetch(:policy)
       @notifier = ActiveSupport::Notifications if defined?(ActiveSupport::Notifications)
+      @conflict_response_status = config.fetch(:conflict_response_status, 429)
     end
 
     def call(env)
@@ -45,7 +46,7 @@ module IdempotentRequest
     end
 
     def concurrent_request_response
-      status = 429
+      status = @conflict_response_status
       headers = { 'Content-Type' => 'application/json' }
       body = [ Oj.dump('error' => 'Concurrent requests detected') ]
       request.env['idempotent.request']['concurrent_request_response'] = true
