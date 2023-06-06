@@ -1,4 +1,6 @@
-# Idempotent Request [![Build Status](https://travis-ci.org/qonto/idempotent-request.svg?branch=master)](https://travis-ci.org/qonto/idempotent-request)
+![Gem Version](https://badge.fury.io/rb/idempotent-request.svg) ![CI Status](https://github.com/qonto/idempotent-request/actions/workflows/tests.yml/badge.svg)
+
+# Idempotent Requestidempotent-request
 
 Rack middleware ensuring at most once requests for mutating endpoints.
 
@@ -140,11 +142,11 @@ Get notified when a client sends a request with the same idempotency key:
 ```ruby
 class RailsCallback
   attr_reader :request
-  
+
   def initialize(request)
     @request = request
   end
-  
+
   def detected(key:)
     Rails.logger.warn "IdempotentRequest request detected, key: #{key}"
   end
@@ -166,3 +168,8 @@ The gem is available as open source under the terms of the [MIT License](http://
 ## Code of Conduct
 
 Everyone interacting in the Idempotent::Request project’s codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/[USERNAME]/idempotent-request/blob/master/CODE_OF_CONDUCT.md).
+
+
+## Releasing
+
+To publish a new version to rubygems, update the version in `lib/version.rb`, and merge.
