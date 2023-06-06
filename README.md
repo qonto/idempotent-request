@@ -1,6 +1,6 @@
 ![Gem Version](https://badge.fury.io/rb/idempotent-request.svg) ![CI Status](https://github.com/qonto/idempotent-request/actions/workflows/tests.yml/badge.svg)
 
-# Idempotent Requestidempotent-request
+# Idempotent Request
 
 Rack middleware ensuring at most once requests for mutating endpoints.
 
